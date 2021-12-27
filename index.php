@@ -19,15 +19,6 @@ if ((isset($uri[2]) && $uri[2] != 'order')) {
 header('Content-type: application/json; charset=UTF-8');
  
 $objFeedController = new OrderController();
-if (!isset($uri[3]) || strcmp($uri[3],"")==0){
-    $strMethodName = "processTaskAction";
-}
-else{
-    $strMethodName = "getAction";
-}
-if (method_exists($objFeedController, $strMethodName))
-    $objFeedController->{$strMethodName}();
-else{
-    throw new Exception("Method not found");
-}
+$objFeedController->processTaskAction($uri);
+
 ?>

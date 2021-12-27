@@ -60,10 +60,10 @@ class OrderModel extends AuthModel
 
         // Get order
         $note = !empty($order['note']) ? "'".$order['note']."'" : "NULL";
-        $insert_order = $this->executeStatement("INSERT INTO OrderTable (user_id, note, status, order_timestamp)
+        $insert_order = $this->executeStatement("INSERT INTO OrderTable (user_id, note, status)
                                         VALUES (".$user[0]['user_id'].", 
                                         $note,
-                                        \"active\", ".time().")");
+                                        \"active\")");
         // Returning order if there are no product list
         if (!isset($order['product_list']) )
             return $insert_order;
@@ -82,6 +82,15 @@ class OrderModel extends AuthModel
             }
         }
         return $is_complete;
+    }
+
+    public function updateOrderStatus($order_id, $status, $api_token_key){
+        // Authorizing request
+
+        // Run update
+        return $this->executeStatement("UPDATE OrderTable
+                                        SET status = \"$status\"
+                                        WHERE order_id = $order_id");
     }
 }
 ?>
