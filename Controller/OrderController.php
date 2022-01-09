@@ -6,6 +6,9 @@ class OrderController extends BaseController
         BaseController::__construct();
     }
 
+    /**
+     * Handle the uri.
+     */
     public function processTaskAction($uri)
     {
         $this->strErrorDesc = '';
@@ -86,6 +89,9 @@ class OrderController extends BaseController
         }
     }
 
+    /**
+     * Create an order.
+     */
     public function createAction()
     {
         if (isset($_SERVER['HTTP_X_API_KEY'])) {
@@ -117,6 +123,9 @@ class OrderController extends BaseController
         }
     }
 
+    /**
+     * Get an order.
+     */
     public function getAction($uri)
     {
         if (isset($uri[3]) && isset($_SERVER['HTTP_X_API_KEY'])) {
@@ -148,6 +157,9 @@ class OrderController extends BaseController
         }
     }
 
+    /**
+     * Update an order status.
+     */
     public function updateStatusAction($uri){
         $arrQueryStringParams = $this->getQueryStringParams();
         if (isset($uri[3]) && isset($_SERVER['HTTP_X_API_KEY']) && isset($arrQueryStringParams["status"])) {

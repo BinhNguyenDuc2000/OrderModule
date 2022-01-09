@@ -3,6 +3,9 @@ class Database
 {
     protected $connection = null;
  
+    /**
+     * Initialize the database connection.
+     */
     public function __construct()
     {
         try {
@@ -15,7 +18,10 @@ class Database
             throw new Exception($e->getMessage());   
         }           
     }
- 
+    
+    /**
+     * Run a query with given params and handle results.
+     */
     public function select($query = "" , $params = [])
     {
         try {
@@ -30,6 +36,9 @@ class Database
         return false;
     }
  
+    /**
+     * Execute a query.
+     */
     protected function executeStatement($query = "" , $params = [])
     {
         try {
