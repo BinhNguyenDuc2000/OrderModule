@@ -1,49 +1,12 @@
 <?php
-class OrderController extends BaseController
+
+class OrderController extends BaseController implements OrderControllerInterface
 {
-    public function __construct()
+    public $orderModel;
+    public function __construct(OrderModelInterface $orderModel)
     {
         BaseController::__construct();
-    }
-
-    /**
-     * Handle the uri.
-     */
-    public function processTaskAction($uri)
-    {
-        $this->strErrorDesc = '';
-        $requestMethod = $_SERVER["REQUEST_METHOD"];
-        if (!isset($uri[3]) || strcmp($uri[3], "") == 0) {
-            switch (strtoupper($requestMethod)) {
-                case "GET":
-                    $this->indexAction();
-                    break;
-                case "POST":
-                    $this->createAction();
-                    break;
-                default:
-                    $this->methodNotSupported();
-                    $this->sendOutput(
-                        json_encode(array('error' => $this->strErrorDesc)),
-                        array('Content-Type: application/json', $this->strErrorHeader)
-                    );
-            }
-        } else {
-            switch (strtoupper($requestMethod)) {
-                case "GET":
-                    $this->getAction($uri);
-                    break;
-                case "PATCH":
-                    $this->updateStatusAction($uri);
-                    break;
-                default:
-                    $this->methodNotSupported();
-                    $this->sendOutput(
-                        json_encode(array('error' => $this->strErrorDesc)),
-                        array('Content-Type: application/json', $this->strErrorHeader)
-                    );
-            }
-        }
+        $this->orderModel = $orderModel;
     }
 
     /**
@@ -54,7 +17,7 @@ class OrderController extends BaseController
 
         $arrQueryStringParams = $this->getQueryStringParams();
 
-        $orderModel = new OrderModel();
+        $this->orderModel = new OrderModel();
         $intLimit = 10;
         if (isset($arrQueryStringParams['limit']) && $arrQueryStringParams['limit'] > 0) {
             $intLimit = $arrQueryStringParams['limit'];
@@ -62,7 +25,7 @@ class OrderController extends BaseController
 
         if (isset($_SERVER['HTTP_X_API_KEY'])) {
             $apiTokenKey = $_SERVER['HTTP_X_API_KEY'];
-            $arrOrders = $orderModel->getOrders($intLimit, $apiTokenKey);
+            $arrOrders = $this->orderModel->getOrders($intLimit, $apiTokenKey);
 
             if ($arrOrders != NULL) {
                 $responseData = json_encode($arrOrders);
@@ -89,17 +52,14 @@ class OrderController extends BaseController
         }
     }
 
-    /**
-     * Create an order.
-     */
     public function createAction()
     {
         if (isset($_SERVER['HTTP_X_API_KEY'])) {
             $order = json_decode(file_get_contents("php://input"), true);
             $apiTokenKey = $_SERVER['HTTP_X_API_KEY'];
             //Set order model before query
-            $orderModel = new OrderModel();
-            $arrOrder = $orderModel->createOrder($order, $apiTokenKey);
+            $this->orderModel = new OrderModel();
+            $arrOrder = $this->orderModel->createOrder($order, $apiTokenKey);
             if ($arrOrder) {
                 $responseData = json_encode(array("Message" => "Order created successfully"));
             } else {
@@ -123,17 +83,14 @@ class OrderController extends BaseController
         }
     }
 
-    /**
-     * Get an order.
-     */
     public function getAction($uri)
     {
         if (isset($uri[3]) && isset($_SERVER['HTTP_X_API_KEY'])) {
             $orderId = (int)$uri[3];
             $apiTokenKey = $_SERVER['HTTP_X_API_KEY'];
             //Set order model before query
-            $orderModel = new OrderModel();
-            $arrOrder = $orderModel->getOrder($orderId, $apiTokenKey);
+            $this->orderModel = new OrderModel();
+            $arrOrder = $this->orderModel->getOrder($orderId, $apiTokenKey);
             if ($arrOrder != NULL) {
                 $responseData = json_encode($arrOrder);
             } else {
@@ -157,18 +114,15 @@ class OrderController extends BaseController
         }
     }
 
-    /**
-     * Update an order status.
-     */
     public function updateStatusAction($uri){
-        $arrQueryStringParams = $this->getQueryStringParams();
-        if (isset($uri[3]) && isset($_SERVER['HTTP_X_API_KEY']) && isset($arrQueryStringParams["status"])) {
+        $order = json_decode(file_get_contents("php://input"), true);
+        if (isset($uri[3]) && isset($_SERVER['HTTP_X_API_KEY']) && isset($order["status"])) {
             $orderId = (int)$uri[3];
             $apiTokenKey = $_SERVER['HTTP_X_API_KEY'];
-            $status = $arrQueryStringParams["status"];
+            $status = $order["status"];
             //Set order model before query
-            $orderModel = new OrderModel();
-            $arrOrder = $orderModel->updateOrderStatus($orderId, $status, $apiTokenKey);
+            $this->orderModel = new OrderModel();
+            $arrOrder = $this->orderModel->updateOrderStatus($orderId, $status, $apiTokenKey);
             if ($arrOrder) {
                 $responseData = json_encode(array("Message" => "Order updated successfully"));
             } else {
@@ -196,7 +150,7 @@ class OrderController extends BaseController
     /**
      * When the order is not found within the database.
      */
-    private function orderNotFound()
+    public function orderNotFound()
     {
         $this->strErrorDesc = "Order not found";
         $this->strErrorHeader = 'HTTP/1.1 404 Not Found';
@@ -205,7 +159,7 @@ class OrderController extends BaseController
     /**
      * When the api argument is not correct.
      */
-    private function invalidArgument()
+    public function invalidArgument()
     {
         $this->strErrorDesc = "Invalid Argument";
         $this->strErrorHeader = 'HTTP/1.1 400 Bad Request';
@@ -214,7 +168,7 @@ class OrderController extends BaseController
     /**
      * When the method use is not correct.
      */
-    private function methodNotSupported()
+    public function methodNotSupported()
     {
         $this->strErrorDesc = 'Method not supported';
         $this->strErrorHeader = 'HTTP/1.1 405 Method Not Allowed';
@@ -223,7 +177,7 @@ class OrderController extends BaseController
     /**
      * When failed to create new order
      */
-    private function failedToCreateOrder()
+    public function failedToCreateOrder()
     {
         $this->strErrorDesc = 'Failed to create new order';
         $this->strErrorHeader = 'HTTP/1.1 500';
@@ -232,7 +186,7 @@ class OrderController extends BaseController
     /**
      * When failed to update new order
      */
-    private function failedToUpdateOrder()
+    public function failedToUpdateOrder()
     {
         $this->strErrorDesc = 'Failed to update order';
         $this->strErrorHeader = 'HTTP/1.1 500';

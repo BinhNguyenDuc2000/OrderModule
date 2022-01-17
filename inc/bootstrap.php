@@ -6,6 +6,9 @@ require_once PROJECT_ROOT_PATH . "/inc/config.php";
  
 // include the base controller file
 require_once PROJECT_ROOT_PATH . "/Controller/Api/BaseController.php";
+
+// include the use interface file
+require_once PROJECT_ROOT_PATH . "/Model/OrderModelInterface.php";
  
 // include the use model file
 require_once PROJECT_ROOT_PATH . "/Model/OrderModel.php";

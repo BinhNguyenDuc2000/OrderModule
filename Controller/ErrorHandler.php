@@ -9,6 +9,7 @@ class ErrorHandler{
         http_response_code(500);
         echo json_encode([
             "code" => $exception->getCode(),
+            "file" => $exception->getFile(),
             "message" => $exception->getMessage(),
             "line" => $exception->getLine()
         ]);

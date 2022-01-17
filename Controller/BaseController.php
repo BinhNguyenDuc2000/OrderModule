@@ -1,9 +1,9 @@
 <?php
 class BaseController
 {
-    protected $strErrorDesc;
-    protected $strErrorHeader;
-    protected $arrQueryStringParams;
+    protected $strErrorDesc="";
+    protected $strErrorHeader="";
+    protected $arrQueryStringParams="";
 
     public function __construct()
     {    

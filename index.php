@@ -8,7 +8,7 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = explode( '/', $uri );
 
 // Check url
-if ((isset($uri[2]) && $uri[2] != 'order')) {
+if (!(isset($uri[2]))) {
     // header("{$_SERVER['SERVER_PROTOCOL']} 404 Not Found");
     // header("Content-Type: application/json");
     http_response_code(404);
@@ -17,8 +17,7 @@ if ((isset($uri[2]) && $uri[2] != 'order')) {
 }
 
 header('Content-type: application/json; charset=UTF-8');
- 
-$objFeedController = new OrderController();
-$objFeedController->processTaskAction($uri);
 
-?>
+$urlProcessor = new UrlProcessor();
+$orderModel = new OrderModel();
+$urlProcessor->processTaskAction($uri, new OrderController($orderModel));

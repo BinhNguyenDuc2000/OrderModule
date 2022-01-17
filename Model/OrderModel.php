@@ -1,9 +1,9 @@
 <?php
 require_once PROJECT_ROOT_PATH . "/Model/AuthModel.php";
  
-class OrderModel extends AuthModel
+class OrderModel extends Database implements OrderModelInterface
 {
-    public function getOrders($limit, $api_token_key)
+    public function getOrders($limit, $api_token_key) 
     {
         // Authorizing request
 
@@ -27,20 +27,11 @@ class OrderModel extends AuthModel
     public function getOrder($order_id, $api_token_key)
     {
         // Authorizing request
-        $user = $this->getUser($api_token_key);
-        if (!$user ){
-            throw new Exception("Invalid API token key");
-        }
 
         // Get order
         $order = $this->select("SELECT * FROM OrderTable WHERE order_id = $order_id");
         if (!$order){
             return null;
-        }
-
-        // Check user_id
-        if ($user[0]['user_id'] != $order[0]['user_id']){
-            throw new Exception("Invalid API token key");
         }
         
         // Getting product list for order
@@ -53,17 +44,11 @@ class OrderModel extends AuthModel
     public function createOrder($order, $api_token_key)
     {
         // Authorizing request
-        $user = $this->getUser($api_token_key);
-        if (!$user ){
-            throw new Exception("Invalid API token key");
-        }
 
         // Get order
+        $user_id = 2;
         $note = !empty($order['note']) ? "'".$order['note']."'" : "NULL";
-        $insert_order = $this->executeStatement("INSERT INTO OrderTable (user_id, note, status)
-                                        VALUES (".$user[0]['user_id'].", 
-                                        $note,
-                                        \"active\")");
+        $insert_order = $this->executeStatement("INSERT INTO OrderTable (user_id, delivery_note, status) VALUES ($user_id, $note, 'active')");
         // Returning order if there are no product list
         if (!isset($order['product_list']) )
             return $insert_order;
