@@ -2,14 +2,18 @@
 
 class PromotionModule19 extends Api implements PromotionModuleInterface
 {
-    public function setPromotion($code){
-        $response = json_decode($this->get(
-            sprintf("https://ltct-sp19-api.herokuapp.com/api/sale/code/admin/%s", $code)
-        ))->{'data'};
-        $this->discount = $response->{'discount'};
-        $this->condition = $response->{'condition'};
-        $this->deleted = $response->{'deleted'} ? true : false;
-        $this->isActived = $response->{'isActived'} ? true : false;
+    public function setPromotion($code)
+    {
+        try {
+            $response = json_decode($this->get(
+                sprintf("https://ltct-sp19-api.herokuapp.com/api/sale/code/admin/%s", $code)
+            ))->{'data'};
+            $this->discount = $response->{'discount'};
+            $this->condition = $response->{'condition'};
+            $this->deleted = $response->{'deleted'} ? true : false;
+            $this->isActived = $response->{'isActived'} ? true : false;
+        } catch (Exception $e) {
+        }
     }
 
     public function getSubtotal($total)
@@ -17,24 +21,25 @@ class PromotionModule19 extends Api implements PromotionModuleInterface
         try {
             switch ($this->discount->{'discountType'}) {
                 case 1:
-                    $reduct = min($total*$this->discount->{'discountValue'}/100, $this->dicount->{'subConditions'});
-                    return $total-$reduct;
+                    $reduct = min($total * $this->discount->{'discountValue'} / 100, $this->discount->{'subConditions'});
+
+                    return $total - $reduct;
                     break;
                 case 2:
-                    $reduct = min($this->discount->{'discountValue'}, $this->dicount->{'subConditions'});
-                    return $total-$reduct;
+                    $reduct = min($this->discount->{'discountValue'}, $this->discount->{'subConditions'});
+                    return $total - $reduct;
                     break;
                 default:
                     return $total;
             }
-            
         } catch (Exception $e) {
             return $total;
         }
     }
-    public function checkCondition($price, $totalProduct){
+    public function checkCondition($price, $totalProduct)
+    {
         try {
-            if ($this->deleted || !$this->isActived){
+            if ($this->deleted || !$this->isActived) {
                 return false;
             }
             switch ($this->condition->{'conditionType'}) {
@@ -45,8 +50,7 @@ class PromotionModule19 extends Api implements PromotionModuleInterface
                 default:
                     return false;
             }
-        }
-        catch (Exception $e){
+        } catch (Exception $e) {
             return false;
         }
     }
