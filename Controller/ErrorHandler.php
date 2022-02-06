@@ -13,5 +13,6 @@ class ErrorHandler{
             "message" => $exception->getMessage(),
             "line" => $exception->getLine()
         ]);
+        exit();
     }
 }

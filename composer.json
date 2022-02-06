@@ -1,7 +1,25 @@
 {
     "autoload": {
         "psr-4": {
-            "": "./Controller"
+            "": 
+            [
+                "./Controller",
+                "./Controller/Delivery",
+                "./Controller/Order",
+                "./Controller/User",
+                "./Model",
+                "./Model/Delivery",
+                "./Model/Order",
+                "./Model/User",
+                "./ExternalModule"
+            ]
         }
+    },
+    "require": {
+        "guzzlehttp/guzzle": "7.0"
+    },
+    "config": {
+
+        "platform-check": false
     }
 }
